@@ -1,7 +1,11 @@
 package com.imooc.miaosha.controller;
 
+import com.imooc.miaosha.domain.User;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
+import com.imooc.miaosha.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/demo")
 public class SampleController {
+
+    @Autowired
+    @Qualifier("userService")
+    private UserService userService;
 
     @RequestMapping("/thymeleaf")
     public String thymeleaf(Model model) {
@@ -41,5 +49,26 @@ public class SampleController {
     public Result<String> helloError(Model model) {
 
         return Result.error(CodeMsg.SERVER_ERROR);
+    }
+
+    /**
+     * 测试数据库
+     * @return
+     */
+    @RequestMapping("/db/get")
+    @ResponseBody
+    public Result<User> get() {
+        User user = userService.getUserById(1);
+        return Result.success(user);
+    }
+    /**
+     * 测试事务
+     * @return
+     */
+    @RequestMapping("/db/Tx")
+    @ResponseBody
+    public Result<Boolean> dbTx() {
+        boolean b = userService.dbTx();
+        return Result.success(b);
     }
 }
