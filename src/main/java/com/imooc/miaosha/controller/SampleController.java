@@ -1,6 +1,7 @@
 package com.imooc.miaosha.controller;
 
 import com.imooc.miaosha.domain.User;
+import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
 import com.imooc.miaosha.service.UserService;
@@ -22,6 +23,10 @@ public class SampleController {
     @Autowired
     @Qualifier("userService")
     private UserService userService;
+
+    @Autowired
+    @Qualifier("redisService")
+    private RedisService redisService;
 
     @RequestMapping("/thymeleaf")
     public String thymeleaf(Model model) {
@@ -70,5 +75,28 @@ public class SampleController {
     public Result<Boolean> dbTx() {
         boolean b = userService.dbTx();
         return Result.success(b);
+    }
+
+    /**
+     * 测试redisGet
+     * @return
+     */
+    @RequestMapping("/redis/get")
+    @ResponseBody
+    public Result<Long> redisGet() {
+        Long v1 = redisService.get("key1", Long.class);
+        return Result.success(v1);
+    }
+
+    /**
+     * 测试redisSet
+     * @return
+     */
+    @RequestMapping("/redis/set")
+    @ResponseBody
+    public Result<String> redisSet() {
+        redisService.set("key2", "hello,redis");
+        String res1 = redisService.get("key2", String.class);
+        return Result.success(res1);
     }
 }
