@@ -22,11 +22,13 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    public <T> T get(String key, Class<T> clazz) {
+    public <T> T get(KeyPrefix keyPrefix,String key, Class<T> clazz) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
-            String s = jedis.get(key);
+            // 生成真正的key
+            String readKey = keyPrefix.getPrefix()+key;
+            String s = jedis.get(readKey);
             T t = stringToBean(s,clazz);
             return t;
         } finally {
@@ -41,7 +43,7 @@ public class RedisService {
      * @param <T>
      * @return
      */
-    public <T> boolean set(String key, T value) {
+    public <T> boolean set(KeyPrefix keyPrefix,String key, T value) {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
@@ -49,7 +51,9 @@ public class RedisService {
             if (string == null || string.length() <= 0) {
                 return false;
             }
-            jedis.set(key, string);
+            // 生成真正的key
+            String readKey = keyPrefix.getPrefix()+key;
+            jedis.set(readKey, string);
             return true;
         } finally {
             returnToPool(jedis);
