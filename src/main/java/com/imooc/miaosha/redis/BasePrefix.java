@@ -7,6 +7,9 @@ public abstract class BasePrefix implements KeyPrefix {
 
     private String prefix;
 
+    /*
+     *0代表永不过期
+     */
     public BasePrefix(String prefix) {
         this(0, prefix);
     }

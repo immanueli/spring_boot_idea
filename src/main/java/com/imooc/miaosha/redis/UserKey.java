@@ -2,7 +2,7 @@ package com.imooc.miaosha.redis;
 
 public class UserKey extends BasePrefix {
 
-    public UserKey(String prefix) {
+    private UserKey(String prefix) {
         super(prefix);
     }
 

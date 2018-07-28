@@ -3,11 +3,9 @@ package com.imooc.miaosha.redis;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 @Service("redisService")
 public class RedisService {
@@ -37,7 +35,7 @@ public class RedisService {
     }
 
     /**
-     * redis设置值
+     * redis设置值 (过期时间)
      * @param key
      * @param value
      * @param <T>
@@ -53,8 +51,69 @@ public class RedisService {
             }
             // 生成真正的key
             String readKey = keyPrefix.getPrefix()+key;
-            jedis.set(readKey, string);
+            int seconds = keyPrefix.expireSeconds();
+            if (seconds <= 0){
+                // 永远不过期
+                jedis.set(readKey, string);
+            }else{
+                jedis.setex(readKey, seconds,string);
+            }
             return true;
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 增加
+     * @param keyPrefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> Long incr(KeyPrefix keyPrefix,String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            // 生成真正的key
+            String readKey = keyPrefix.getPrefix()+key;
+            return jedis.incr(readKey);
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * 减少
+     * @param keyPrefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> Long decr(KeyPrefix keyPrefix,String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            // 生成真正的key
+            String readKey = keyPrefix.getPrefix()+key;
+            return jedis.decr(readKey);
+        } finally {
+            returnToPool(jedis);
+        }
+    }
+
+    /**
+     * redis 判断key是否存在
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> boolean exists(KeyPrefix keyPrefix,String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String readKey = keyPrefix.getPrefix()+key;
+            return jedis.exists(readKey);
         } finally {
             returnToPool(jedis);
         }
