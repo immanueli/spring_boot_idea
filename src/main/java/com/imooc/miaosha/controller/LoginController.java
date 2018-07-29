@@ -4,18 +4,17 @@ import com.imooc.miaosha.redis.RedisService;
 import com.imooc.miaosha.result.CodeMsg;
 import com.imooc.miaosha.result.Result;
 import com.imooc.miaosha.service.MiaoShaUserService;
-import com.imooc.miaosha.util.ValidatorUtil;
 import com.imooc.miaosha.vo.LoginVo;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
 
 /**
  * 登录功能
@@ -44,7 +43,7 @@ public class LoginController {
      */
     @RequestMapping("/doLogin")
     @ResponseBody
-    public Result<Boolean> doLogin(@Validated LoginVo loginVo) {
+    public Result<Boolean> doLogin(@Valid LoginVo loginVo) {
         logger.info("参数校验:"+loginVo.toString());
 //        String password = loginVo.getPassword();
 //        String mobile = loginVo.getMobile();
