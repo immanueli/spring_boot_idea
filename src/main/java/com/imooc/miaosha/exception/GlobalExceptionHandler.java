@@ -19,7 +19,8 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
-    public Result<String> exceptionHandler(HttpServletRequest request,Exception e){
+    public Result<String> exceptionHandler(Exception e){
+        e.printStackTrace();
         if(e instanceof GlobalException){
             GlobalException gx = (GlobalException) e;
             return Result.error(gx.getCm());

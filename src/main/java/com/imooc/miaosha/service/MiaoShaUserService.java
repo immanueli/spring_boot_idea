@@ -47,12 +47,26 @@ public class MiaoShaUserService {
         }
         // 验证密码
         String dbPass = user.getPassword();
-        System.out.println(dbPass);
         String saltDB = user.getSalt();
         String calcPass = MD5Util.formPassToDBPass(formPass, saltDB);
         if (!dbPass.equals(calcPass)){
             throw new GlobalException ( CodeMsg.PASSWORD_ERROR);
         }
+        // 生成cookie
+        addCookie(user,response);
+        return true;
+    }
+
+    public MiaoShaUser getByToken(String token,HttpServletResponse response) {
+        if (StringUtils.isEmpty(token)) return null;
+        // 延长有效期
+        MiaoShaUser miaoShaUser = redisService.get(MiaoShaUserKey.token, token, MiaoShaUser.class);
+        if (miaoShaUser != null) addCookie(miaoShaUser,response);
+        return miaoShaUser;
+    }
+
+    // 生成cookie
+    private void addCookie(MiaoShaUser user,HttpServletResponse response){
         // 生成 cookie
         String token = UUIDUtil.uuid();
         // 存放在redis 服务器中
@@ -61,11 +75,5 @@ public class MiaoShaUserService {
         cookie.setMaxAge(MiaoShaUserKey.token.expireSeconds());
         cookie.setPath("/");
         response.addCookie(cookie);
-        return true;
-    }
-
-    public MiaoShaUser getByToken(String token) {
-        if (StringUtils.isEmpty(token)) return null;
-        return redisService.get(MiaoShaUserKey.token,token,MiaoShaUser.class);
     }
 }
