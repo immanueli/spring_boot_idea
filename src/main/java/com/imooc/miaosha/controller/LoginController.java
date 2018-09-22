@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -43,10 +44,10 @@ public class LoginController {
      */
     @RequestMapping("/doLogin")
     @ResponseBody
-    public Result<Boolean> doLogin(@Valid LoginVo loginVo) {
+    public Result<Boolean> doLogin(HttpServletResponse response, @Valid LoginVo loginVo) {
         logger.info("参数校验:"+loginVo.toString());
         // 登录
-        boolean b = miaoShaUserService.login(loginVo);
+        boolean b = miaoShaUserService.login(response,loginVo);
         return Result.success(b);
     }
 }

@@ -83,4 +83,6 @@ public class MiaoShaUser implements Serializable {
     public void setLoginCount(Integer loginCount) {
         this.loginCount = loginCount;
     }
+
+
 }

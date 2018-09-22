@@ -1,0 +1,51 @@
+package com.imooc.miaosha.controller;
+
+import com.imooc.miaosha.domain.MiaoShaUser;
+import com.imooc.miaosha.redis.MiaoShaUserKey;
+import com.imooc.miaosha.redis.RedisService;
+import com.imooc.miaosha.result.Result;
+import com.imooc.miaosha.service.MiaoShaUserService;
+import com.imooc.miaosha.vo.LoginVo;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+/**
+ * 商品
+ */
+@Controller
+@RequestMapping("/goods")
+public class GoodsController {
+
+    private static Logger logger = LoggerFactory.getLogger(GoodsController.class);
+
+    @Autowired
+    private MiaoShaUserService miaoShaUserService;
+    /**
+     * @return toList
+     */
+    @RequestMapping("/toList")
+    public String toList(Model model, @CookieValue (value = MiaoShaUserService.COOKIE_NAME_TKOEN,required = false) String cookieToken,
+                         @RequestParam(value = MiaoShaUserService.COOKIE_NAME_TKOEN,required = false) String paramToken) {
+        if(StringUtils.isEmpty(cookieToken) && StringUtils.isEmpty(paramToken)){
+            return "login";
+        }
+        String token = StringUtils.isEmpty(paramToken) ? cookieToken : paramToken;
+        MiaoShaUser user = miaoShaUserService.getByToken(token);
+        model.addAttribute("user",user);
+        return "goodsList";
+    }
+
+
+}

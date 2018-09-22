@@ -74,6 +74,7 @@
         },function(data){
             if (data.code == 0){
                 layer.msg("登录成功");
+                window.location.href = "/goods/toList";
             }else{
                 layer.msg(data.msg);
             }
