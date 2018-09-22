@@ -20,7 +20,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public Result<String> exceptionHandler(HttpServletRequest request,Exception e){
-        if (e instanceof BindException){
+        if(e instanceof GlobalException){
+            GlobalException gx = (GlobalException) e;
+            return Result.error(gx.getCm());
+        }else if (e instanceof BindException){
             BindException be = (BindException) e;
             List<ObjectError> allErrors = be.getAllErrors();
             ObjectError objectError = allErrors.get(0);
