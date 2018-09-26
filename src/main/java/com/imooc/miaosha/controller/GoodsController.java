@@ -63,12 +63,9 @@ public class GoodsController {
     public String toDetail(Model model, MiaoShaUser user, @PathVariable("goodsId") Long goodsId) {
         model.addAttribute("user",user);
         GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
-
         long startTime = goodsVo.getStartDate().getTime();
-        System.out.println(startTime);
         long endTime = goodsVo.getEndDate().getTime();
         long now = System.currentTimeMillis();
-        System.out.println(now);
         int miaoShaStatus;
         int remainSecond;
         if (now < startTime){
