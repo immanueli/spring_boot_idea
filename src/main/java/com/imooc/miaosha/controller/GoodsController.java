@@ -15,13 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 /**
@@ -35,9 +33,13 @@ public class GoodsController {
 
     @Autowired
     private MiaoShaUserService miaoShaUserService;
+
     @Autowired
     @Qualifier("goodsService")
     private GoodsService goodsService;
+
+    @Autowired
+    private RedisService redisService;
 
     /**
      * @return toList
@@ -54,15 +56,34 @@ public class GoodsController {
     /**
      * 商品详情页
      * @param model
-     * @param response
-     * @param cookieToken
-     * @param paramToken
+     * @param user
      * @return
      */
-    @RequestMapping("/toDetail")
-    public String toDetail(Model model, HttpServletResponse response,@CookieValue (value = MiaoShaUserService.COOKIE_NAME_TKOEN,required = false) String cookieToken,
-                         @RequestParam(value = MiaoShaUserService.COOKIE_NAME_TKOEN,required = false) String paramToken) {
+    @RequestMapping("/toDetail/{goodsId}")
+    public String toDetail(Model model, MiaoShaUser user, @PathVariable("goodsId") Long goodsId) {
+        model.addAttribute("user",user);
+        GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
 
+        long startTime = goodsVo.getStartDate().getTime();
+        System.out.println(startTime);
+        long endTime = goodsVo.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+        System.out.println(now);
+        int miaoShaStatus;
+        int remainSecond;
+        if (now < startTime){
+            miaoShaStatus = 0;
+            remainSecond = (int)((startTime - now) / 1000);
+        }else if(now < endTime){
+            miaoShaStatus = 2;
+            remainSecond = -1;
+        }else{
+            miaoShaStatus = 1;
+            remainSecond = 0;
+        }
+        model.addAttribute("goods",goodsVo);
+        model.addAttribute("miaoshaStatus",miaoShaStatus);
+        model.addAttribute("remainSeconds",remainSecond);
         return "goodsDetail";
     }
 
